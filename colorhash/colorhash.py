@@ -33,6 +33,30 @@ def crc32_hash(obj):
     return crc32(bs) & 0xFFFFFFFF
 
 
+def valid_alpha(alpha: Number, percent=False) -> Number:
+    """Validate and convert an alpha
+
+    >>> alpha_to_hex(75)
+    191
+    >>> alpha_to_hex(.45, percent=True)
+    45
+
+    Args:
+        alpha (Number): An alpha value as either a float or int [0, 100]
+        percent (bool, optional): Wether to return a hex or percent. Defaults to False.
+
+    Returns:
+        Number: The hex or percent value
+    """
+    if isinstance(alpha, float):
+        if alpha > 1.0:
+            alpha = min(100.0, alpha) / 100.0
+    elif isinstance(alpha, int):
+        if alpha > 1:
+            alpha = min(100, alpha) / 100.0
+    return round(max(0.0, alpha) * 100) if percent else round(max(0.0, alpha) * 255)
+
+
 def hsl2rgb(hsl):
     """Convert an HSL color value into RGB.
 
@@ -70,14 +94,14 @@ def hsl2rgb(hsl):
     return tuple(rgb)
 
 
-def rgb2hex(rgb):
+def rgb2hex(rgb, alpha=100):
     """Format an RGB color value into a hexadecimal color string.
 
     >>> rgb2hex((255, 0, 0))
     '#ff0000'
     """
     try:
-        return "#%02x%02x%02x" % rgb
+        return "#%02x%02x%02x%02x" % (valid_alpha(alpha), *rgb)
     except TypeError:
         raise ValueError(rgb)
 
@@ -89,6 +113,7 @@ def color_hash(
     saturation=(0.35, 0.5, 0.65),
     min_h=None,
     max_h=None,
+    **kwargs,
 ):
     """Calculate the color for the given object.
 
@@ -142,6 +167,7 @@ class ColorHash:
     """
 
     def __init__(self, *args, **kwargs):
+        self.__dict__.update(kwargs)
         self.hsl = color_hash(*args, **kwargs)
 
     @property
@@ -150,4 +176,4 @@ class ColorHash:
 
     @property
     def hex(self):
-        return rgb2hex(self.rgb)
+        return rgb2hex(self.rgb, self.alpha)
