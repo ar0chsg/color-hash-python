@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "colorhash"
-version = "1.0.4"
+version = "1.0.5"
 description = "Generate color based on any object"
 authors = [
     "Aroon Chande <achande@seagen.com>",

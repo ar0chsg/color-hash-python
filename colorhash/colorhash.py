@@ -57,7 +57,7 @@ def valid_alpha(alpha: Number, percent=False) -> Number:
     return round(max(0.0, alpha) * 100) if percent else round(max(0.0, alpha) * 255)
 
 
-def hsl2rgb(hsl):
+def hsl2rgb(hsl, alpha=100):
     """Convert an HSL color value into RGB.
 
     >>> hsl2rgb((0, 1, 0.5))
@@ -91,7 +91,7 @@ def hsl2rgb(hsl):
             c = p
         rgb.append(round(c * 255))
 
-    return tuple(rgb)
+    return "rgba(%i, %i, %i, %i)" % (*rgb, alpha)
 
 
 def rgb2hex(rgb, alpha=100):
@@ -100,8 +100,9 @@ def rgb2hex(rgb, alpha=100):
     >>> rgb2hex((255, 0, 0))
     '#ff0000'
     """
+    r, g, b, a = rgb
     try:
-        return "#%02x%02x%02x%02x" % (valid_alpha(alpha), *rgb)
+        return "#%02x%02x%02x%02x" % (a, r, g, b)
     except TypeError:
         raise ValueError(rgb)
 
@@ -169,10 +170,14 @@ class ColorHash:
     def __init__(self, *args, **kwargs):
         self.__dict__.update(kwargs)
         self.hsl = color_hash(*args, **kwargs)
+        if "alpha" in kwargs:
+            self.alpha = valid_alpha(kwargs["alpha"])
+        else:
+            self.alpha = valid_alpha(100)
 
     @property
     def rgb(self):
-        return hsl2rgb(self.hsl)
+        return hsl2rgb(self.hsl, self.alpha)
 
     @property
     def hex(self):
