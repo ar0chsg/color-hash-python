@@ -94,17 +94,17 @@ def hsl2rgb(hsl, alpha=100):
     return "rgba(%i, %i, %i, %i)" % (*rgb, alpha)
 
 
-def rgb2hex(rgb, alpha=100):
+def rgb2hex(rgba):
     """Format an RGB color value into a hexadecimal color string.
 
     >>> rgb2hex((255, 0, 0))
     '#ff0000'
     """
-    r, g, b, a = rgb
+    r, g, b, a = rgba
     try:
         return "#%02x%02x%02x%02x" % (a, r, g, b)
     except TypeError:
-        raise ValueError(rgb)
+        raise ValueError(rgba)
 
 
 def color_hash(
